@@ -75,7 +75,7 @@ function makeField(size: number) {
   );
 }
 async function w(w = 200) {
-  return new Promise(res => setTimeout(res, 0));
+  return new Promise(res => setTimeout(res, 1));
 }
 
 function App() {
@@ -104,11 +104,7 @@ function App() {
     const getCol = (n: number) => field.map(row => row[n]);
     const getRow = (n: number) => field[n];
 
-    const getAllOptions = (
-      row: FieldValue[],
-      conf: number[],
-      debug = false
-    ) => {
+    const getAllOptions = (conf: number[], debug = false) => {
       const addSegment = (
         arr: FieldValue[],
         segNum: number
@@ -151,12 +147,8 @@ function App() {
       return opts;
     };
 
-    const getAllOptionsFiltered = (
-      row: FieldValue[],
-      conf: number[],
-      debug = false
-    ) =>
-      getAllOptions(row, conf, false)
+    const getAllOptionsFiltered = (conf: number[], debug = false) =>
+      getAllOptions(conf, false)
         .filter(
           opt =>
             opt.length <= fieldSize &&
@@ -191,6 +183,11 @@ function App() {
     const countConfigCol = (n: number) =>
       config.cols[n].reduce((sum, a) => sum + a, 0);
 
+    const allOptionsPrepared = {
+      rows: config.rows.map(c => getAllOptionsFiltered(c)),
+      cols: config.cols.map(c => getAllOptionsFiltered(c))
+    };
+
     while (true) {
       if (count() === countConfig()) {
         setIsDone(true);
@@ -204,21 +201,10 @@ function App() {
           await w(100);
           continue;
         }
-        /*if (!opened) {
-          console.log(
-            countConfigRow(i) + config.rows[i].length - 1,
-            fieldSize / 2
-          );
-          if (countConfigRow(i) + config.rows[i].length - 1 < fieldSize / 2) {
-            await w(100);
-            continue;
-          }
-        }*/
 
         const row = getRow(i);
-        const conf = config.rows[i];
 
-        const allOptions = getAllOptionsFiltered(row, conf);
+        const allOptions = allOptionsPrepared.rows[i];
 
         const allOptionsFiltered = allOptions.filter(opt => {
           const wrong = opt.find(
@@ -227,6 +213,8 @@ function App() {
 
           return !wrong;
         });
+
+        allOptionsPrepared.rows[i] = allOptionsFiltered;
 
         const sames = (Array.from({ length: fieldSize }).fill(
           false
@@ -253,21 +241,10 @@ function App() {
           await w(100);
           continue;
         }
-        /*if (!opened) {
-          console.log(
-            countConfigCol(j) + config.cols[j].length - 1,
-            fieldSize / 2
-          );
-          if (countConfigCol(j) + config.cols[j].length - 1 < fieldSize / 2) {
-            await w(100);
-            continue;
-          }
-        }*/
 
         const row = getCol(j);
-        const conf = config.cols[j];
 
-        const allOptions = getAllOptionsFiltered(row, conf);
+        const allOptions = allOptionsPrepared.cols[j];
 
         const allOptionsFiltered = allOptions.filter(opt => {
           const wrong = opt.find(
@@ -276,6 +253,8 @@ function App() {
 
           return !wrong;
         });
+
+        allOptionsPrepared.cols[j] = allOptionsFiltered;
 
         const sames = (Array.from({ length: fieldSize }).fill(
           false
