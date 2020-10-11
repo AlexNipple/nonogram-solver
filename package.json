@@ -10,6 +10,7 @@
     "@types/node": "^12.12.67",
     "@types/react": "^16.9.51",
     "@types/react-dom": "^16.9.8",
+    "bluebird": "^3.7.2",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.3",
@@ -35,5 +36,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@types/bluebird": "^3.5.32",
+    "prettier": "^2.1.2"
   }
 }
